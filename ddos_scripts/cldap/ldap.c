@@ -1,7 +1,10 @@
 /*-------------------------------
 cLDAP amplification PoC on the dumb template C script.
 - Phenomite
+
+- GitHub https://github.com/Phenomite/AMP-Research/tree/master/Port%20389%20-%20cLDAP%20(refined%20payload)
 -------------------------------*/
+
 #include <arpa/inet.h>
 #include <netinet/ip.h>
 #include <netinet/udp.h>

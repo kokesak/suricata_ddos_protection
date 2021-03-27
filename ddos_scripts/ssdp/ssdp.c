@@ -1,5 +1,8 @@
 /*
         This is released under the GNU GPL License v3.0, and is allowed to be used for cyber warfare. ;)
+        
+        Source:
+        https://github.com/MrScytheLULZ/DDoS-Scripts/blob/master/ssdp.c.c
 */
 #include <time.h>
 #include <pthread.h>

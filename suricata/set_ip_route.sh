@@ -1,20 +1,17 @@
 # /bin/bash
 
-IP=/sbin/ip
-LOCAL_NETWORK='192.168.100.0/24'
-LOCAL_DEFAULT_GW='192.168.100.1' # Default gateway for suricata for local network
-INT_NAME='ens9'
-INT_IP='192.168.100.171'
+source ../config.sh
 
+IP=/sbin/ip
 DNS='nameserver 8.8.8.8'
 
 echo 'Adding route to the local network...'
-$IP route add $LOCAL_NETWORK via $INT_IP dev $INT_NAME
+$IP route add $VICTIM_NETWORK via $VICTIM_SURICATA_GW_IP dev $SURICATA_INTERFACE_NAME_VICTIM_NETWORK
 test $? -eq 1 && { echo 'Failed (1)'; exit 1; }
 
 # Can happen in virtual environment
 echo 'Delete default route to local networwk (can cause problems sometimes)...'
-$IP route del default via $LOCAL_DEFAULT_GW
+$IP route del default via $HOST_PC_VICTIM_NETWORK_GW
 
 echo 'Seting up dns.google.com as DNS server...'
 echo "nameserver $DNS" >> /etc/resolv.conf

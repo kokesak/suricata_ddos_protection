@@ -5,6 +5,7 @@ memcached Proof of Concept Amplification via spoofed source UDP packets. Repo in
 
 memcached.c - Source code (https://pastebin.com/raw/ZiUeinae)
 memecache-amp-03-05-2018-rd.list - List of memcached servers as of 03-05-2018 (https://pastebin.com/raw/eSCHTTVu)
+Edit: github source: https://github.com/responsibleD/memcached-PoC
 
 Compile: gcc memcached.c -o memecached -pthread
 

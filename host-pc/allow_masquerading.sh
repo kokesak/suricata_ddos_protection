@@ -1,7 +1,11 @@
+#/bin/bash
+
+source ../config.sh
+
 IPTABLES=/sbin/iptables
 
-WANIF='wlp2s0'
-LANIF='vnet1'
+HOST_PC_WANIF='wlp2s0'
+HOST_PC_VICTIM_LANIF='vnet1'
 
 # enable ip forwarding in the kernel
 echo 'Enabling Kernel IP forwarding...'
@@ -14,12 +18,12 @@ $IPTABLES -X
 
 # enable masquerading to allow LAN internet access
 echo 'Enabling IP Masquerading and other rules...'
-$IPTABLES -t nat -A POSTROUTING -o $LANIF -j MASQUERADE
-$IPTABLES -A FORWARD -i $LANIF -o $WANIF -m state --state RELATED,ESTABLISHED -j ACCEPT
-$IPTABLES -A FORWARD -i $WANIF -o $LANIF -j ACCEPT
+$IPTABLES -t nat -A POSTROUTING -o $HOST_PC_VICTIM_LANIF -j MASQUERADE
+$IPTABLES -A FORWARD -i $HOST_PC_VICTIM_LANIF -o $HOST_PC_WANIF -m state --state RELATED,ESTABLISHED -j ACCEPT
+$IPTABLES -A FORWARD -i $HOST_PC_WANIF -o $HOST_PC_VICTIM_LANIF -j ACCEPT
 
-$IPTABLES -t nat -A POSTROUTING -o $WANIF -j MASQUERADE
-$IPTABLES -A FORWARD -i $WANIF -o $LANIF -m state --state RELATED,ESTABLISHED -j ACCEPT
-$IPTABLES -A FORWARD -i $LANIF -o $WANIF -j ACCEPT
+$IPTABLES -t nat -A POSTROUTING -o $HOST_PC_WANIF -j MASQUERADE
+$IPTABLES -A FORWARD -i $HOST_PC_WANIF -o $HOST_PC_VICTIM_LANIF -m state --state RELATED,ESTABLISHED -j ACCEPT
+$IPTABLES -A FORWARD -i $HOST_PC_VICTIM_LANIF -o $HOST_PC_WANIF -j ACCEPT
 
 echo 'Done!'
