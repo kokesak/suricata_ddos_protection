@@ -27,7 +27,6 @@ make
 make install
 ```
 #
-#
 
 For Memcached server we need to install and run this service on UDP port 11211. My version of memcached is: 1.4.25-2ubuntu1.5.
 Ubuntu 16.04:
@@ -59,6 +58,8 @@ Note that there may be more libraries and dependecies required that are not ment
 ### Usage
 Edit `config.sh` to reflect your testing environment. Then run `set_up.sh` and `launch_attack.sh`.
 
-#
 For `set_up.sh` and `launch_attack.sh` use option `-h` or`--help` to get information how to use them.
 
+## LICENSE
+This code is under GNUv3 License. See `LICENSE` file for more.
+All the DDoS script that are not written by me are properly refered to their original GitHub page.
