@@ -1,7 +1,5 @@
 # /bin/bash
 
-source ../config.sh
-
 IP=/sbin/ip
 DNS='nameserver 8.8.8.8'
 

@@ -1,11 +1,6 @@
 #/bin/bash
 
-source ../config.sh
-
 IPTABLES=/sbin/iptables
-
-HOST_PC_WANIF='wlp2s0'
-HOST_PC_VICTIM_LANIF='vnet1'
 
 # enable ip forwarding in the kernel
 echo 'Enabling Kernel IP forwarding...'

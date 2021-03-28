@@ -1,7 +1,5 @@
 #! /bin/bash
 
-source ../config.sh
-
 IP=/sbin/ip
 
 echo 'Deleting default gw...'

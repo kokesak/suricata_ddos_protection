@@ -25,19 +25,26 @@ print_help(){
 
 case "$USER_CHOICE" in
     "victim")
-        ssh -l "$VICTIM_USR" "$VICTIM_IP" /bin/bash <"victim/set_ip_route.sh"
+        ssh -l "$VICTIM_USR" "$VICTIM_IP" \
+            VICTIM_SURICATA_GW_IP="$VICTIM_SURICATA_GW_IP"  VICTIM_INTERFACE_NAME="$VICTIM_INTERFACE_NAME" \
+            /bin/bash <"victim/set_ip_route.sh"
         ;;
     "suricata")
         # TODO suricata-update?
         # set routes on Suricata
-        ssh -l "$SURICATA_USR" "$SURICATA_IP" /bin/bash <"suricata/set_ip_route.sh"
+        ssh -l "$SURICATA_USR" "$SURICATA_IP" \
+            VICTIM_NETWORK="$VICTIM_NETWORK" VICTIM_SURICATA_GW_IP="$VICTIM_SURICATA_GW_IP" \
+            SURICATA_INTERFACE_NAME_VICTIM_NETWORK="$SURICATA_INTERFACE_NAME_VICTIM_NETWORK" \
+            HOST_PC_VICTIM_NETWORK_GW="$HOST_PC_VICTIM_NETWORK_GW" \
+            /bin/bash <"suricata/set_ip_route.sh"
         ;;
     "host-pc")
         #
         # Set host-pc so Victim si able to communicate with outside world
         #
         echo -e "${YELLOW}This command must be run as root!${NC}"
-        sudo /bin/bash "host-pc/allow_masquerading.sh"
+        sudo HOST_PC_VICTIM_LANIF="$HOST_PC_VICTIM_LANIF" HOST_PC_WANIF="$HOST_PC_WANIF" \
+            /bin/bash "host-pc/allow_masquerading.sh"
         ;;
     "attacker")
         #

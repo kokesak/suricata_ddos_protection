@@ -90,13 +90,13 @@ modify_host_pre_attack() {
     #
     # Modify host before attack
     #
-    echo -e '${YELLOW}This attack uses outer network servers'
-    echo 'Host pc has to be modified to route incomming network traffic through Suricata'
-    echo 'After the attack changes will be reverted'
-    echo 'Root access is needed!${NC}'
+    echo -e "${YELLOW}This attack uses outer network servers"
+    echo    "Host pc has to be modified to route incomming network traffic through Suricata"
+    echo    "After the attack changes will be reverted"
+    echo -e "Root access is needed!${NC}"
 
     # set up host-pc routing table
-    sudo /sbin/ip route del "$VICTIM_NETWORK"
+    sudo /sbin/ip route del "$VICTIM_NETWORK" || { echo -e "${RED}Error!${NC}"; exit 1; }
     sudo /sbin/ip route add "$VICTIM_NETWORK" via "$SURICATA_IP"
     /sbin/ip route
     echo "Waiting 2 secnods for changes to take affect..."
@@ -107,8 +107,8 @@ modify_host_post_attack() {
     #
     # Revert changes made to host-pc after the attack
     #
-    echo '${YELLOW}Reverting changes made to host-pc...${NC}'
-    sudo /sbin/ip route del "$VICTIM_NETWORK" via "$SURICATA_IP"
+    echo -e "${YELLOW}Reverting changes made to host-pc...${NC}"
+    sudo /sbin/ip route del "$VICTIM_NETWORK" via "$SURICATA_IP" || { echo -e "${RED}Error!${NC}"; exit 1; }
     sudo /sbin/ip route add "$VICTIM_NETWORK" via "$HOST_PC_VICTIM_NETWORK_GW"
 }
 
