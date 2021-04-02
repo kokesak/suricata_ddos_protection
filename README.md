@@ -43,6 +43,11 @@ Check that Memcached serivce is running:
 systemctl restart memcached && systemctl status memcached
 ```
 
+For DNS server we need to install following packages on Ubuntu:
+```
+sudo apt install bind9 dnsutils
+```
+
 #### Attacker
 There are severl utilites which may be required. I use Kali Linux 2020.4.
 | Attack | Utility |
