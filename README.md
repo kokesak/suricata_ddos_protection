@@ -82,7 +82,7 @@ There are severl utilites which may be required. I use Kali Linux 2020.4.
 Note that there may be more libraries and dependecies required that are not mention here.
 
 ### Usage
-Edit `config.sh` to reflect your testing environment. Then run `set_up.sh` and `launch_attack.sh`.
+Edit `config.sh` to reflect your testing environment. In `ddos_scripts/attack_spec.sh` are some specifications for certain attacks, this should also be modified. Then run `set_up.sh` and `launch_attack.sh`.
 
 For `set_up.sh` and `launch_attack.sh` use option `-h` or`--help` to get information how to use them.
 
