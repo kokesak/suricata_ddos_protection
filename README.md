@@ -26,6 +26,12 @@ cd ntp-4.2.6p2
 make
 make install
 ```
+Make sure that the following lines are commented out in `/etc/ntp.conf`:
+```
+#restrict default -4 nomodify nopeer noquery notrap
+#restrict default -6 nomodify nopeer noquery notrap
+```
+
 #
 
 For Memcached server we need to install and run this service on UDP port 11211. My version of memcached is: 1.4.25-2ubuntu1.5.
@@ -42,11 +48,26 @@ Check that Memcached serivce is running:
 ```txt
 systemctl restart memcached && systemctl status memcached
 ```
+#
 
 For DNS server we need to install following packages on Ubuntu:
-```
+```sh
 sudo apt install bind9 dnsutils
 ```
+We need add follwoing lines to the `/etc/bind/named.conf.options` file:
+```
+allow-query { 192.168.100/24; 192.168.122/24; };
+```
+Where IP network address are the addresses of VICTIM and ATTACKER (optional). 
+
+Optionally we can have those lines in `/etc/bind/named.conf.default-zones`
+```
+zone "." {
+     type hint;
+     file "/etc/bind/mydb.root";
+};
+```
+Where `mydb.root` file has the content found here: http://www.internic.net/domain/named.root
 
 #### Attacker
 There are severl utilites which may be required. I use Kali Linux 2020.4.
