@@ -1,0 +1,11 @@
+##### CLDAP RULES
+
+drop udp any 389 -> $HOME_NET any (msg:"ET Possible CLDAP DOS Response"; content:"|30 84 00 00|"; offset:0; depth:4; threshold: type both, track by_rule, count 10,seconds 60; flowbits: set, cldap.dos;classtype:attempted-dos; sid:1031; rev:1;)
+
+alert ip any any -> $HOME_NET any (msg:"ET Possible CLDAP DOS (FRAGMENT_1)"; fragbits: M; flow:no_stream; flowbits: set, cldap.dos; threshold: type both, track by_dst, count 10, seconds 60; classtype:attempted-dos; sid:1032 ; rev: 1; )
+
+#alert ip any any -> $HOME_NET any (msg:"ET Possible CLDAP DOS (FRAGMENT_2)"; flowbits:isset, cldap_dos; fragoffset: >0; flow:no_stream; threshold: type both, track by_rule, count 3, seconds 60; classtype:attempted-dos; sid:1032 ; rev: 1; )
+
+
+drop udp $EXTERNAL_NET any -> $HOME_NET 389 (msg:"ET DOS Potential CLDAP DOS Querry"; content:"objectclass0"; fast_pattern; threshold:type both, count 100, seconds 60, track by_src; reference:url,www.akamai.com/us/en/multimedia/documents/state-of-the-internet/cldap-threat-advisory.pdf; reference:url,packetstormsecurity.com/files/139561/LDAP-Amplication-Denial-Of-Service.html; classtype:attempted-dos; sid:2024585; rev:1; metadata:affected_product Windows_XP_Vista_7_8_10_Server_32_64_Bit, affected_product Linux, attack_target Client_and_Server, created_at 2017_08_16, deployment Perimeter, former_category DOS, performance_impact Significant, signature_severity Major, updated_at 2017_08_16;)
+

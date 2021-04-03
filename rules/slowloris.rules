@@ -1,0 +1,8 @@
+##### SLOWLORIS
+# TODO mozne lze neco z toho vice specifikovat (distance, within...)
+#alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"Possible Slowloris Attack Detected";flow:to_server,established; content:"X-a|3a| "; distance:0; dsize:<15; pcre:"/\d\d\d\d/"; content:"|0d 0a|"; endswith; threshold:type both, track by_dst, count 3, seconds 30; sid:1071;)
+
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"Possible Slowloris Attack Detected";flow:to_server,established; content:"X-"; distance:0; fast_pattern; pcre:"/.*\: .*/"; content:"|0d 0a|"; endswith; threshold:type both, track by_dst, count 2, seconds 30; sid:1071;)
+
+## X-%RND%: %RND%
+

@@ -1,0 +1,13 @@
+##### RST
+#alert tcp any any -> any any (msg:"ET SCAN Malformed Packet SYN RST"; flags:SR; classtype:bad-unknown; sid:2011368; rev:2; metadata:created_at 2010_09_28, updated_at 2010_09_28;)
+
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"ET EXPLOIT RST Flood With Window"; flow:no_stream,to_server; flags:R; window:!0; threshold: type both, track by_dst, seconds 1, count 200; reference:url,www.cs.ucr.edu/~zhiyunq/pub/sec16_TCP_pure_offpath.pdf; reference:cve,2016-5696; classtype:misc-attack; sid:1041; rev:2; metadata:affected_product Linux, attack_target Server, created_at 2016_08_29, deployment Perimeter, performance_impact Significant, signature_severity Major, updated_at 2016_08_29;)
+
+
+##### SYN
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"ET EXPLOIT SYN Flood With Window"; flow:no_stream,to_server; flags:S; window:!0; threshold: type both, track by_dst, seconds 1, count 101; classtype:misc-attack; sid:1042; rev:1;)
+
+##### ACK
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"ET EXPLOIT ACK Flood With Window"; flow:no_stream,to_server; flags:A; window:!0; threshold: type both, track by_dst, seconds 1, count 101; classtype:misc-attack; sid:1043; rev:1;)
+
+

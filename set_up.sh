@@ -37,6 +37,9 @@ case "$USER_CHOICE" in
             SURICATA_INTERFACE_NAME_VICTIM_NETWORK="$SURICATA_INTERFACE_NAME_VICTIM_NETWORK" \
             HOST_PC_VICTIM_NETWORK_GW="$HOST_PC_VICTIM_NETWORK_GW" \
             /bin/bash <"suricata/set_ip_route.sh"
+
+            scp rules/*.rules "$SURICATA_USR@$SURICATA_IP:/etc/suricata/my-rules"
+            scp suricata/suricata.yaml suricata/threshold.config "$SURICATA_USR@$SURICATA_IP:/etc/suricata/"
         ;;
     "host-pc")
         #
@@ -50,9 +53,16 @@ case "$USER_CHOICE" in
         #
         # Copy ddos scripts to the attacker machine
         scp -r ddos_scripts/ "$ATTACKER_USR@$ATTACKER_IP:/root/"
+
+        ssh -l "$ATTACKER_USR" "$ATTACKER_IP" \
+            VICTIM_NETWORK="$VICTIM_NETWORK" \
+            SURICATA_IP="$SURICATA_IP" \
+            /bin/bash <"attacker/set_up_attacker.sh"
         ;;
     "ntp")
         echo -e "${YELLOW}This must be run after attacker has been set up!${NC}"
+
+        scp amp_server/ntp.conf "$AMP_SERVER_USR@$AMP_SERVER_IP:/etc"
 
         ssh -l "$AMP_SERVER_USR" "$AMP_SERVER_IP" \
             VICTIM_NETWORK="$VICTIM_NETWORK" \
@@ -65,13 +75,22 @@ case "$USER_CHOICE" in
         ssh -l "$ATTACKER_USR" "$ATTACKER_IP" \
             "pushd /root/ddos_scripts/ntpdos; /bin/bash 600ntp.sh >/var/log/600ntp.sh 2>/var/log/600ntp.err; popd"
         ;;
-     "memcached")
+    "memcached")
         ssh -l "$AMP_SERVER_USR" "$AMP_SERVER_IP" \
             VICTIM_NETWORK="$VICTIM_NETWORK"\
             SURICATA_IP="$SURICATA_IP" \
             /bin/bash <"amp_server/set_memcached_server.sh"
-            ;;
-   *)
+        ;;
+    "dns")
+        scp amp_server/named.conf.default-zones amp_server/named.conf.options amp_server/mydb.root \
+            "$AMP_SERVER_USR@$AMP_SERVER_IP:/etc/bind/"
+
+        ssh -l "$AMP_SERVER_USR" "$AMP_SERVER_IP" \
+             VICTIM_NETWORK="$VICTIM_NETWORK"\
+             SURICATA_IP="$SURICATA_IP" \
+             /bin/bash <"amp_server/set_dns_server.sh"
+        ;;
+    *)
         echo -e "${RED}Wrong argument: '$1'!${NC}"
         print_help
         exit 1

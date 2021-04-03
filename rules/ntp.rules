@@ -1,0 +1,16 @@
+##### NTP RULES
+#
+# Original rule
+#alert udp $EXTERNAL_NET 123 -> $HOME_NET any (msg:"ET DOS Possible NTP DDoS Multiple MON_LIST Seq 0 Response Spanning Multiple Packets IMPL 0x03"; content:"|00 03 2a|"; offset:1; depth:3; byte_test:1,&,128,0; byte_test:1,&,64,0; byte_test:1,&,4,0; byte_test:1,&,2,0; byte_test:1,&,1,0; threshold: type both,track by_src,count 2,seconds 60; reference:url,www.symantec.com/connect/blogs/hackers-spend-christmas-break-launching-large-scale-ntp-reflection-attacks; classtype:attempted-dos; sid:2017921; rev:2; metadata:created_at 2014_01_02, updated_at 2014_01_02;)
+
+#
+# My rules - shorter version of the original 
+#
+
+drop udp $EXTERNAL_NET 123 -> $HOME_NET any (msg:"ET DOS Possible NTP DDoS Multiple MON_LIST Response (IMPL 0x03)"; content:"|03 2a|"; offset:2; depth:2; byte_test:1,&,128,0; byte_test:1,&,4,0; byte_test:1,&,2,0; byte_test:1,&,1,0;content:"|00 48|"; offset:6; depth:2; threshold: type both,track by_rule,count 2,seconds 60; classtype:attempted-dos; sid:1021; rev:1;)
+
+drop udp $EXTERNAL_NET 123 -> $HOME_NET any (msg:"ET DOS Possible NTP DDoS Multiple MON_LIST Response (IMPL 0x02)"; content:"|02 2a|"; offset:2; depth:2; byte_test:1,&,128,0; byte_test:1,&,64,0; byte_test:1,&,4,0; byte_test:1,&,2,0; byte_test:1,&,1,0;content:"|00 48|"; offset:6; depth:2; threshold: type both,track by_rule,count 2,seconds 60; classtype:attempted-dos; sid:1022; rev:1;)
+
+drop udp $EXTERNAL_NET any -> $HOME_NET 123 (msg:"ET DOS Possible NTP DDoS Multiple MON_LIST Request (IMPL 0x03)"; content:"|03 2a|"; offset:2; depth:2; byte_test:1,!&,128,0; byte_test:1,&,4,0; byte_test:1,&,2,0; byte_test:1,&,1,0; threshold: type both,track by_dst,count 1,seconds 60;classtype:attempted-dos; sid:1023; rev:1; )
+
+drop udp $EXTERNAL_NET any -> $HOME_NET 123 (msg:"ET DOS Possible NTP DDoS Multiple MON_LIST Request (IMPL 0x02)"; content:"|02 2a|"; offset:2; depth:2; byte_test:1,!&,128,0; byte_test:1,&,64,0;byte_test:1,&,4,0; byte_test:1,&,2,0; byte_test:1,&,1,0; threshold: type both,track by_dst,count 1,seconds 60;classtype:attempted-dos; sid:1024; rev:1; )

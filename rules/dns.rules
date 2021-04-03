@@ -1,0 +1,7 @@
+##### DNS RULES
+
+drop udp any 53 -> $HOME_NET any (msg:"ET Possible DDoS DNS Response (QTYPE=<ROOT> ANY)"; content:"|00 00 ff 00 01|"; offset:12; depth:5; byte_test:1,&,128,2; threshold: type both, track by_dst, count 5, seconds 60; classtype:attempted-dos; sid:1001 ; rev: 2;)
+
+drop udp any any -> $HOME_NET 53 (msg:"ET Possible DDoS DNS Querry (QTYPE=<ROOT> ANY)"; content:"|00 00 ff 00 01|"; offset:12; depth:5; byte_test:1,!&,128,2; threshold: type both, track by_dst, count 2, seconds 60; classtype:attempted-dos; sid:1002 ; rev: 1;)
+
+alert ip any any -> $HOME_NET any (msg:"ET Possible DDoS DNS (FRAGMENT)"; fragbits: M; flow:no_stream; threshold: type both, track by_rule, count 3, seconds 60; classtype:attempted-dos; sid:1003 ; rev: 1; )
