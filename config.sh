@@ -6,6 +6,8 @@ VICTIM_NETWORK="192.168.100.0/24"
 VICTIM_USR="root"
 VICTIM_INTERFACE_NAME="ens3"
 VICTIM_SURICATA_GW_IP="192.168.100.171"
+# This is for need for slow attacks
+# for some reason, http server works badly when started in /root directory
 VICTIM_HOME_PATH="/home/victim"
 
 SURICATA_IP="192.168.122.39"

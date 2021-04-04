@@ -33,3 +33,11 @@ __WINDOW_END=256
 # number of times to repeat same request in the connection. Use to
 # multiply response size if server supports persistent connections.
 __REPEAT_REQ=3
+
+# This is for tcpreplay, we also need to set mac addresses in virtual environment
+__ATTACKER_MAC_ADDR="52:54:00:a9:3f:df"
+# Suricat's interface that is NOT connected to the victim's network
+__SURICATA_MAC_ADDR="52:54:00:2d:4c:c4"
+
+
+
