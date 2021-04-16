@@ -2,4 +2,4 @@
 
 drop udp any 1194 -> $HOME_NET any  (msg:"ET DDOS OpenVPN Response - Hard Reset Server V2"; content:"|40|"; startswith; flow:not_established; threshold: type both, track by_src, count 6, seconds 30; classtype:attempted-dos; sid:1011; rev:1;)
 
-drop udp any any -> $HOME_NET 1194  (msg:"ET DDOS OpenVPN Querry - Hard Reset Client V2"; content:"|38|"; startswith; threshold: type both, track by_dst, count 5, seconds 30; classtype:attempted-dos; sid:1012; rev:1;)
+drop udp any any -> $HOME_NET 1194  (msg:"ET DDOS OpenVPN Querry - Hard Reset Client V2"; content:"|38|"; startswith; flow: not_established; threshold: type both, track by_dst, count 5, seconds 30; classtype:attempted-dos; sid:1012; rev:1;)

@@ -32,15 +32,17 @@ case "$USER_CHOICE" in
     "suricata")
         # TODO suricata-update?
         # set routes on Suricata
+        scp rules/*.rules "$SURICATA_USR@$SURICATA_IP:/etc/suricata/my-rules"
+        scp suricata/suricata.yaml suricata/threshold.config "$SURICATA_USR@$SURICATA_IP:/etc/suricata/"
+        scp suricata/default_startup.config "$SURICATA_USR@$SURICATA_IP:/etc/default/suricata"
+
         ssh -l "$SURICATA_USR" "$SURICATA_IP" \
             VICTIM_NETWORK="$VICTIM_NETWORK" VICTIM_SURICATA_GW_IP="$VICTIM_SURICATA_GW_IP" \
             SURICATA_INTERFACE_NAME_VICTIM_NETWORK="$SURICATA_INTERFACE_NAME_VICTIM_NETWORK" \
             HOST_PC_VICTIM_NETWORK_GW="$HOST_PC_VICTIM_NETWORK_GW" \
             /bin/bash <"suricata/set_ip_route.sh"
 
-            scp rules/*.rules "$SURICATA_USR@$SURICATA_IP:/etc/suricata/my-rules"
-            scp suricata/suricata.yaml suricata/threshold.config "$SURICATA_USR@$SURICATA_IP:/etc/suricata/"
-        ;;
+       ;;
     "host-pc")
         #
         # Set host-pc so Victim si able to communicate with outside world
@@ -76,6 +78,8 @@ case "$USER_CHOICE" in
             "pushd /root/ddos_scripts/ntpdos; /bin/bash 600ntp.sh >/var/log/600ntp.sh 2>/var/log/600ntp.err; popd"
         ;;
     "memcached")
+        scp amp_server/memcached.conf "$AMP_SERVER_USR@$AMP_SERVER_IP:/etc"
+
         ssh -l "$AMP_SERVER_USR" "$AMP_SERVER_IP" \
             VICTIM_NETWORK="$VICTIM_NETWORK"\
             SURICATA_IP="$SURICATA_IP" \

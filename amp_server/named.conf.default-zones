@@ -1,7 +1,7 @@
 // prime the server with knowledge of the root servers
 
 zone "." {
-     type hint;
+     type master;
      file "/etc/bind/mydb.root";
 };
 

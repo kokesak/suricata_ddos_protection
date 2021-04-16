@@ -3,7 +3,9 @@
 IP=/sbin/ip
 
 $IP route add $VICTIM_NETWORK via $SURICATA_IP
-test $? -eq 1 && { echo 'Failed (1)'; exit 1; }
+test $? -ne 0 && { echo 'Failed (1)'; exit 1; }
+
+#TODO check installed requirements
 
 make -C /root/ddos_scripts/dns
 make -C /root/ddos_scripts/memcache

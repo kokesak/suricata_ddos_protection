@@ -12,7 +12,7 @@ RED='\033[0;31m' # RED Color
 NC='\033[0m' # No Color
 
 __POSSIBLE_ATTACK_VECTOR=("ntp" "dns" "cldap" "memcached" "openvpn"
-                            "flood-syn" "flood-ack" "flood-rst" "floods"
+                            "flood-syn" "flood-ack" "flood-rst" "flood-udp" "floods"
                             "ssdp" "slowloris" "slowread")
 
 
