@@ -28,9 +28,10 @@ case "$USER_CHOICE" in
         ssh -l "$VICTIM_USR" "$VICTIM_IP" \
             VICTIM_SURICATA_GW_IP="$VICTIM_SURICATA_GW_IP"  VICTIM_INTERFACE_NAME="$VICTIM_INTERFACE_NAME" \
             /bin/bash <"victim/set_ip_route.sh"
+        scp -r victim/slowread_file.txt "$VICTIM_USR@$VICTIM_IP:$VICTIM_HOME_PATH"
         ;;
     "suricata")
-        # TODO suricata-update?
+        # TODO suricata-update maybe?
         # set routes on Suricata
         scp rules/*.rules "$SURICATA_USR@$SURICATA_IP:/etc/suricata/my-rules"
         scp suricata/suricata.yaml suricata/threshold.config "$SURICATA_USR@$SURICATA_IP:/etc/suricata/"

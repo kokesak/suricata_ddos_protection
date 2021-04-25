@@ -19,7 +19,7 @@ do
 	    -o $TEMP_DIR/openvpn.$BASHPID.pcapng --dlt=enet
 
     tcpreplay \
-	    -K -i eth0 -I eth0 \
+	    -K -i eth0 -I eth0 -l 30 \
 	    -c openvpn.cach $TEMP_DIR/openvpn.$BASHPID.pcapng
 
     LOOPS=$(( $LOOPS - 1 ))

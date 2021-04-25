@@ -11,8 +11,8 @@ YELLOW='\033[0;33m'
 RED='\033[0;31m' # RED Color
 NC='\033[0m' # No Color
 
-__POSSIBLE_ATTACK_VECTOR=("ntp" "dns" "cldap" "memcached" "openvpn"
-                            "flood-syn" "flood-ack" "flood-rst" "flood-udp" "floods"
+__POSSIBLE_ATTACK_VECTOR=("ntp" "dns" "cldap" "memcached-stat" "memcached-get" "openvpn"
+                            "flood-syn" "flood-ack" "flood-rst" "flood-udp" "flood-all"
                             "ssdp" "slowloris" "slowread")
 
 
@@ -20,10 +20,10 @@ print_help() {
     #
     # Help message
     #
-    echo -e "${GREEN}Usage: launch_attack.sh [-a attack-vector] [-t attack-type] [-d victim-ip] [-l loops]"
+    echo -e "${GREEN}Usage: launch_test.sh [-a attack-vector] [-t attack-type] [-d victim-ip] [-l loops]"
     echo    "  Options are:"
-    echo    "  -a, --attack-vector: ntp, dns, openvpn, cldap, memcached, flood-syn,"
-    echo    "                       flood-ack, flood-rst, floods, ssdp, slowloris, slowread."
+    echo    "  -a, --attack-vector: ntp, dns, openvpn, cldap, memcached-stat, memcached-get, flood-syn,"
+    echo    "                       flood-ack, flood-rst, flood-udp, flood-all, ssdp, slowloris, slowread."
     echo    ""
     echo    "  -d, --victim-ip:     IPv4 address of a victim."
     echo    ""
@@ -31,16 +31,18 @@ print_help() {
     echo    "                       This option is for OpenVPN, CLDAP, SSDP."
     echo    ""
     echo    "  -s, --time:          Number of seconds that script performs the attack (default 10),"
-    echo    "                       This option is for DNS, Memcached, slowloris."
+    echo    "                       This option is for DNS, Memcached-stat, slowloris, slowread and"
+    echo    "                       all type of flood atatcks."
     echo    ""
     echo    "  -p, --packets:       Number of packets to be sent (default 10),"
-    echo    "                       This option is for NTP, slowloris."
+    echo    "                       This option is for NTP and Memcached-get"
     echo    ""
     echo    "  -t, --attack-type:   Required option for AMPLIFICATION ATTACK,"
-    echo    "                       can be either 'querry' or 'response',"
-    echo    "                       specify if the attack should generate querries to the vulnurable server or responses,"
-    echo    "                       from server."
-    echo -e "                       AMPLIFICATION  ATTACKS: ntp, dns, cldap, openvpn, ssdp, memcached.${NC}"
+    echo    "                       can be either 'query' or 'response',"
+    echo    "                       specify if the attack should generate queries to the vulnurable,"
+    echo    "                       server or responses from server."
+    echo    "                       AMPLIFICATION  ATTACKS: ntp, dns, cldap, openvpn, ssdp, memcached-stat."
+    echo -e "                       Note: for memcached-get this is not supported, it works as response only.${NC}"
 }
 
 check_arguments() {
@@ -103,8 +105,10 @@ restart_suricata() {
 cp_active_rule_to_suricata() {
     local rule_file
     case $ATTACK_VECTOR in
-        floods|flood-ack|flood-syn|flood-rst)
-            rule_file="floods.rule" ;;
+        flood-all|flood-ack|flood-syn|flood-rst|flood-udp)
+            rule_file="floods.rules"         ;;
+        memcached*)
+            rule_file="memcached.rules"      ;;
         *)
             rule_file="$ATTACK_VECTOR.rules" ;;
     esac
@@ -158,6 +162,7 @@ stop_http_server() {
     # Stop HTTP server
     #
     echo 'Stopping http server on port 80...'
+
     ssh -l "$VICTIM_USR" "$VICTIM_IP" \
         "tmux kill-session -t my_http_server"
     test $? -eq 0 && echo "Server stopped successfully!"

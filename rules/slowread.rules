@@ -1,8 +1,15 @@
 ##### Slowread rules
 #
 
-alert tcp $EXTERNAL_NET any -> $HOME_NET 80 (msg:"ET DOS Possible Slowread DDoS - big amount of zero window packets"; flags: A; window:0; threshold: type both, track by_src, count 30, seconds 30; classtype:attempted-dos; sid:1081; rev:1;)
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"ET DOS Possible Slowread Attack Detected - big amount of zero window packets"; flags: A; window:0; threshold: type both, track by_src, count 2, seconds 30; flowint: slowread.count, notset; flowint: slowread.count, =, 1; classtype:attempted-dos; sid:1081; rev:1;)
+
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"ET DOS Possible Slowread Attack Detected - counting"; flags: A; window:0; flowint: slowread.count, isset; flowint: slowread.count, +, 1; noalert; classtype:attempted-dos; sid:1082; rev:1;)
+
+rejectboth tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"ET DOS Possible Slowread Attack Detected - Send RST"; flags: A; window:0; flowint: slowread.count, isset; flowint: slowread.count, >, 4; threshold: type both, track by_src, count 1, seconds 30; bypass; classtype:attempted-dos; sid:1083; rev:1;)
+
+#### TODO this rule does not work
+#reject tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg: "Slowread reaction - Limit new TCP"; flowint: slow, isset; flowint: slow, ==, 1; bypass; classtype:attempted-dos; threshold: type both, track by_src, count 5, seconds 30; sid:1084; rev:1;)
 
 # From emerging-dos.rules:
-#alert tcp $EXTERNAL_NET any -> $HOME_NET $HTTP_PORTS (msg:"ET DOS Large amount of TCP ZeroWindow - Possible Nkiller2 DDos attack"; flags:A; window:0; threshold: type both, track by_src, count 100, seconds 60; reference:url,doc.emergingthreats.net/2009414; classtype:attempted-dos; sid:2009414; rev:4; metadata:created_at 2010_07_30, updated_at 2010_07_30;)
+#rejectboth tcp $EXTERNAL_NET any -> $HOME_NET $HTTP_PORTS (msg:"ET DOS Large amount of TCP ZeroWindow - Possible Nkiller2 DDos attack"; flags:A; window:0; threshold: type both, track by_src, count 100, seconds 60; reference:url,doc.emergingthreats.net/2009414; classtype:attempted-dos; sid:2009414; rev:4; metadata:created_at 2010_07_30, updated_at 2010_07_30;)
 

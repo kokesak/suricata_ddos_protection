@@ -13,7 +13,7 @@ do
     tcpreplay-edit --endpoints="192.168.122.$IP":"$VICTIM" \
         --enet-smac=$__ATTACKER_MAC_ADDR,$__SURICATA_MAC_ADDR \
         --enet-dmac=$__SURICATA_MAC_ADDR,$__ATTACKER_MAC_ADDR \
-        -t -K -i eth0 -I eth0 \
+        -i eth0 -I eth0 \
         -c cldap.cach cldap-querry.pcap
     LOOPS=$(( $LOOPS - 1 ))
 done

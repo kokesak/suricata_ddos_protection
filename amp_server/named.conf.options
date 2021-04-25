@@ -21,7 +21,8 @@ options {
 	dnssec-validation no;
 
 
-	allow-query { 192.168.100/24; 192.168.122/24; };
+	//allow-query { 192.168.100/24; 192.168.122/24; };
+	allow-query { any; };
 
 	auth-nxdomain no;    # conform to RFC1035
 	listen-on-v6 { any; };

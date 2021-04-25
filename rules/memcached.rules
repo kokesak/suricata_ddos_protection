@@ -1,10 +1,15 @@
 ##### MEMCACHED RULES
 
-drop udp any 11211 -> $HOME_NET any (msg:"ET DOS Possible Memcached DDoS Response STAT"; content:"STAT|20|pid"; offset:8; threshold: type both, count 100, seconds 60, track by_dst; flowbits:set, ET.memcached.stat.ddos; classtype:attempted-dos; sid:1051; rev:1;)
+# STAT
+drop udp any 11211 -> $HOME_NET any (msg:"ET DOS Possible Memcached DDoS Response STAT"; content:"STAT|20|pid"; offset:8; threshold: type both, count 10, seconds 60, track by_src; classtype:attempted-dos; sid:1051; rev:1;)
 
-#drop udp any 11211 -> $HOME_NET any (msg:"ET DOS Possible Memcached DDoS Response Continuation";flowbits:isset, ET.memcached.stat.ddos; threshold: type both, count 100, seconds 60, track by_dst; classtype:attempted-dos; sid:1052; rev:1;)
+drop udp any any -> $HOME_NET 11211 (msg:"ET DOS Possible Memcached DDoS Query STAT"; content:"stats"; nocase; depth:13; threshold: type both, count 10, seconds 60, track by_src; classtype:attempted-dos; sid:1053; rev:1;)
 
-drop udp any any -> $HOME_NET 11211 (msg:"ET DOS Possible Memcached DDoS Query STAT"; content:"stats"; nocase; depth:13; threshold: type both, count 15, seconds 60, track by_src; classtype:attempted-dos; sid:1053; rev:1;)
 
+# GET
 alert udp any any -> $HOME_NET 11211 (msg:"ET DOS Possible Memcached DDoS Query GET"; content:"get"; nocase; depth:12; threshold: type both, count 15, seconds 60, track by_src; classtype:attempted-dos; sid:1054; rev:1;)
+
+drop udp any 11211 -> $HOME_NET any (msg:"ET DOS Possible Memcached DDoS Response VALUE"; content:"VALUE"; nocase; depth:13; flowbits: set, ddos.memcached.value; threshold: type both, count 100, seconds 10, track by_src; classtype:attempted-dos; sid:1055; rev:1;)
+
+drop udp any 11211 -> $HOME_NET any (msg:"ET DOS Possible Memcached DDoS Response Continuation"; flowbits: isset, ddos.memcached.value; threshold: type both, count 100, seconds 10, track by_src; classtype:attempted-dos; sid:1056; rev:1;)
 

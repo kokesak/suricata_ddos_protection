@@ -1,8 +1,13 @@
 ##### SLOWLORIS
-# TODO mozne lze neco z toho vice specifikovat (distance, within...)
-#alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"Possible Slowloris Attack Detected";flow:to_server,established; content:"X-a|3a| "; distance:0; dsize:<15; pcre:"/\d\d\d\d/"; content:"|0d 0a|"; endswith; threshold:type both, track by_dst, count 3, seconds 30; sid:1071;)
-
-alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"Possible Slowloris Attack Detected";flow:to_server,established; content:"X-"; distance:0; fast_pattern; pcre:"/.*\: .*/"; content:"|0d 0a|"; endswith; threshold:type both, track by_dst, count 2, seconds 30; sid:1071;)
 
 ## X-%RND%: %RND%
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"Possible Slowloris Attack Detected";flow:to_server,established; content:"X-"; distance:0; fast_pattern; pcre:"/.*\: .*/"; content:"|0d 0a|"; endswith; threshold:type both, track by_src, count 2, seconds 30; flowint: slowloris.count, notset; flowint: slowloris.count, =, 1; classtype:attempted-dos; sid:1071; rev:1;)
+
+alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"Possible Slowloris Attack Detected - counting";flow:to_server,established; content:"X-"; distance:0; fast_pattern; pcre:"/.*\: .*/"; content:"|0d 0a|"; endswith; flowint: slowloris.count, isset; flowint: slowloris.count, +, 1; noalert; classtype:attempted-dos; sid:1072; rev:1;)
+
+rejectboth tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg:"Possible Slowloris Attack Detected Send RST";flow:to_server,established; content:"X-"; distance:0; fast_pattern; pcre:"/.*\: .*/"; content:"|0d 0a|"; endswith; flowint: slowloris.count, isset; flowint: slowloris.count, >, 4; threshold: type both, track by_src, count 1, seconds 30; bypass; classtype:attempted-dos; sid:1073; rev:1;)
+
+#### TODO this rule does not work
+#alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (msg: "Slowloris reaction - Limit new TCP"; flowint: slowloris.count, >, 4; flags:S; flow: not_established; threshold: type both, track by_src, count 1, seconds 30; classtype:attempted-dos; sid:1074; rev:1;)
+
 
