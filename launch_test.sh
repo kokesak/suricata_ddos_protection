@@ -59,7 +59,7 @@ check_arguments() {
                 exit 1
             fi
             ATTACK_VECTOR="$2"
-            shift 2    # past argument
+            shift 2    # shift argument
             ;;
         -t|--attack-type)
             ATTACK_TYPE="$2"
