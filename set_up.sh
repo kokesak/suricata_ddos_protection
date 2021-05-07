@@ -33,6 +33,8 @@ case "$USER_CHOICE" in
     "suricata")
         # TODO suricata-update maybe?
         # set routes on Suricata
+        ssh -l "$SURICATA_USR" "$SURICATA_IP" \
+            "[ -d /etc/suricata/my-rules ] || mkdir /etc/suricata/my-rules"
         scp rules/*.rules "$SURICATA_USR@$SURICATA_IP:/etc/suricata/my-rules"
         scp suricata/suricata.yaml suricata/threshold.config "$SURICATA_USR@$SURICATA_IP:/etc/suricata/"
         scp suricata/default_startup.config "$SURICATA_USR@$SURICATA_IP:/etc/default/suricata"

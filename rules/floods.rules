@@ -1,13 +1,11 @@
-##### RST
-# edited rule form emergency threats:
-drop tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"ET EXPLOIT RST Flood With Window"; flow:not_established,to_server; flags:R; window:!0; threshold: type both, track by_dst, seconds 1, count 200; reference:url,www.cs.ucr.edu/~zhiyunq/pub/sec16_TCP_pure_offpath.pdf; reference:cve,2016-5696; classtype:misc-attack; sid:1041; rev:2; metadata:affected_product Linux, attack_target Server, created_at 2016_08_29, deployment Perimeter, performance_impact Significant, signature_severity Major, updated_at 2016_08_29;)
-
-
 ##### SYN
-drop tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"ET EXPLOIT SYN Flood With Window"; flow:not_established, to_server; flags:S;threshold: type both, track by_dst, seconds 1, count 200; classtype:misc-attack; sid:1042; rev:1;)
+drop tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"Possible SYN Flood"; flow:not_established, to_server; flags:S;threshold: type both, track by_dst, seconds 1, count 201; classtype:misc-attack; sid:1042; rev:1;)
 
 ##### ACK
-drop tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"ET EXPLOIT ACK Flood With Window"; flow:not_established,to_server; flags:A;threshold: type both, track by_dst, seconds 1, count 200; classtype:misc-attack; sid:1043; rev:1;)
+drop tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"Possible ACK Flood"; flow:not_established, to_server; flags:A;threshold: type both, track by_dst, seconds 1, count 201; classtype:misc-attack; sid:1043; rev:1;)
+
+##### RST
+drop tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"Possible RST Flood"; flow:not_established, to_server; flags:R;threshold: type both, track by_dst, seconds 1, count 201; classtype:misc-attack; sid:1041; rev:1;)
 
 ##### UDP
-drop udp any any -> $HOME_NET any (msg:"ET Possible UDP flood"; flow:not_established, to_server; threshold: type both, track by_dst, seconds 1, count 200; classtype:misc-attack; sid:1044; rev:1;)
+drop udp $EXTERNAL_NET any -> $HOME_NET any (msg:"Possible UDP flood"; flow:not_established, to_server; threshold: type both, track by_dst, seconds 1, count 201; classtype:misc-attack; sid:1044; rev:1;)

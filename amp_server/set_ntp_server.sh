@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ntpd
+ntpd || { echo "Failed to start ntp server!"; exit 1; }
 sleep 2
 ntpq -p
 

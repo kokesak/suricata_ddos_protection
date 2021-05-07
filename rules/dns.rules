@@ -1,7 +1,7 @@
 ##### DNS RULES
 
-drop udp any 53 -> $HOME_NET any (msg:"ET Possible DDoS DNS Response (QTYPE=<ROOT> ANY)"; content:"|00 00 ff 00 01|"; offset:12; depth:5; byte_test:1,&,128,2; threshold: type both, track by_src, count 2, seconds 60; classtype:attempted-dos; sid:1001 ; rev: 2;)
+drop udp any 53 -> $HOME_NET any (msg:"Possible DDoS DNS Response (QTYPE=<ROOT> ANY)"; content:"|00 00 ff 00 01|"; offset:12; depth:5; byte_test:1,&,128,2; threshold: type both, track by_src, count 2, seconds 60; classtype:attempted-dos; sid:1001 ; rev: 2;)
 
-drop udp any any -> $HOME_NET 53 (msg:"ET Possible DDoS DNS Querry (QTYPE=<ROOT> ANY)"; content:"|00 00 ff 00 01|"; offset:12; depth:5; byte_test:1,!&,128,2; threshold: type both, track by_src, count 2, seconds 60; classtype:attempted-dos; sid:1002 ; rev: 1;)
+drop udp any any -> $HOME_NET 53 (msg:"Possible DDoS DNS Querry (QTYPE=<ROOT> ANY)"; content:"|00 00 ff 00 01|"; offset:12; depth:5; byte_test:1,!&,128,2; threshold: type both, track by_src, count 2, seconds 60; classtype:attempted-dos; sid:1002 ; rev: 1;)
 
-drop ip any any -> $HOME_NET any (msg:"ET Possible DDoS DNS (FRAGMENT)"; ip_proto:17; fragbits: M; flow:no_stream, no_frag; threshold: type both, track by_src, count 100, seconds 60; classtype:attempted-dos; sid:1003 ; rev: 1; )
+drop ip any any -> $HOME_NET any (msg:"Possible DDoS DNS (FRAGMENT)"; ip_proto:17; fragbits: M; flow:no_stream, no_frag; threshold: type both, track by_src, count 100, seconds 60; classtype:attempted-dos; sid:1003 ; rev: 1; )

