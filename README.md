@@ -57,7 +57,6 @@ We need add follwoing lines to the `/etc/bind/named.conf.options` file:
 ```
 allow-query { any; };
 ```
-Where IP network address are the addresses of VICTIM and ATTACKER (optional). 
 
 Optionally we can have those lines in `/etc/bind/named.conf.default-zones`
 ```
