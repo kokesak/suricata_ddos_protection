@@ -12,7 +12,7 @@ pip install complexhttpserver
 ```
 
 ### Sruciata 
-I used Suricata 6.0.1. How to install Suricata, please refer to the offical [document page](https://suricata.readthedocs.io/en/suricata-6.0.2/).
+I used Suricata 6.0.2. How to install Suricata, please refer to the offical [document page](https://suricata.readthedocs.io/en/suricata-6.0.2/).
 Emergin rules may be find here: https://rules.emergingthreats.net/open/suricata-6.0.1/
 
 ### Amplification server
@@ -39,10 +39,9 @@ Ubuntu 16.04:
 ```sh
 sudo apt-get install memcached libmemcached-tools
 ```
-For listening on UDP port we need to add this lines to the `/etc/memcached.conf` file.
+For listening on UDP port we need to add this line to the `/etc/memcached.conf` file.
 ```txt
 -U 11211
--l <ip address of listening interface>
 ```
 Check that Memcached serivce is running:
 ```txt
@@ -56,7 +55,7 @@ sudo apt install bind9 dnsutils
 ```
 We need add follwoing lines to the `/etc/bind/named.conf.options` file:
 ```
-allow-query { 192.168.100/24; 192.168.122/24; };
+allow-query { any; };
 ```
 Where IP network address are the addresses of VICTIM and ATTACKER (optional). 
 
@@ -77,14 +76,14 @@ There are severl utilites which may be required. I use Kali Linux 2020.4.
 | DNS, CLDAP, MEMCACHED | gcc |
 | OpenVPN, SSDP | [tcpreplay](https://www.xmodulo.com/how-to-install-tcpreplay-on-linux.html) |
 | Floods | [hping3](https://tools.kali.org/information-gathering/hping3) |
-| Slowloris | [SlowHTTPTest](https://tools.kali.org/stress-testing/slowhttptest), [slowloris](https://pypi.org/project/pyslowloris/) |
+| Slowloris, Slowread | [SlowHTTPTest](https://tools.kali.org/stress-testing/slowhttptest), [slowloris](https://pypi.org/project/pyslowloris/) |
 
 Note that there may be more libraries and dependecies required that are not mention here.
 
 ### Usage
-Edit `config.sh` to reflect your testing environment. In `ddos_scripts/attack_spec.sh` are some specifications for certain attacks, this should also be modified. Then run `set_up.sh` and `launch_attack.sh`.
+Edit `config.sh` to reflect your testing environment. In `ddos_scripts/attack_spec.sh` are some specifications for certain attacks, this should also be modified. Then run `set_up.sh` and `launch_test.sh`.
 
-For `set_up.sh` and `launch_attack.sh` use option `-h` or`--help` to get information how to use them.
+For `set_up.sh` and `launch_test.sh` use option `-h` or`--help` to get information how to use them.
 
 ## LICENSE
 This code is under GNUv3 License. See `LICENSE` file for more.
